@@ -25,6 +25,7 @@ main:
         addi $t5, $0, 0
         addi $t4, $0, 1			# Initialize register as 1
         addi $t6, $0, 0
+	addi $t8, $0, 0
 
 space_processing:			# this label skips the spaces in the string until we find the irst character
 	lb $t7, 0($t1)			# load character pointer is at into the register t7
@@ -48,9 +49,10 @@ char_space_processing:			# At this point, we are checking if we are going to fin
         lb $t7, 0($t1)			# or another set of characters.
         addi $t1, $t1, 1		# incrementing pointer
         addi $t3, $t3, 1		# incrementing counter
+	addi $t8, $t8, 1
         beq $t7, 10, return_to_start    # If string is finished branch to return to start
         beq $t7, 0, return_to_start	
-        bne $t7, 32, incorrect_base_error # will say invalid base if another char is found.
+        bne $t7, 32, invalid_base_or_len # will say invalid base if another char is found.
         j char_space_processing         # loops until it branches to one of the above mentioned labels
 
 
@@ -83,6 +85,8 @@ reset_ptr:                              # resetting the  pointer to the start of
         sub $t3, $t3, $t4
         lb $t7, ($t1)			# load first byte
         sub $s4, $t3, $t4		# decremented and set the highest power for this paarticular length of valid string
+
+
 
 find_highest_power:
 	beq $s4, 0, conversion          # Determing the highest power
@@ -155,8 +159,10 @@ empty_error:
 
 	li $v0,10               # ends program
         syscall
+
+invalid_base_or_len:	
+	bgt $t8, 5, too_long_error
+	j incorrect_base_error
+
         
 	jr $ra
-
-
-
