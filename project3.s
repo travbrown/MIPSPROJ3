@@ -161,7 +161,7 @@ empty_error:
         syscall
 
 invalid_base_or_len:	
-	bgt $t8, 5, too_long_error
+	bgt $t8, 2, too_long_error
 	j incorrect_base_error
 
         
