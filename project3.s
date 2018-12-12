@@ -109,6 +109,8 @@ conversion:
         sw $s5, 4($sp)			# store the new 
         beq $s1, $s6, finisha		# base case for recursion
         add $t1, $a0, $s1		# incremental loading of pointer, iterating across input
+        addi $s1, $s1, 1		# increment counter
+        lb $s5, 0($t1)
 
         blt $s5, 48, incorrect_base_error       # checks if character is before 0 in ASCII chart
         blt $s5, 58, Number                     # checks if character is between 48 and 57
@@ -118,16 +120,21 @@ conversion:
         blt $s5, 118, Lower_Case                # checks if character is between 97 and 117
         blt $s5, 128, incorrect_base_error      # checks if character is between 118 and 127
 
-Upper_Case:
-        addi $s5, $s5, -55			# subtraction is done like this to the ASCII to get the value of the char
-        j multiply				# like ASCII 'A' = 65 & 'A' in base 31 = 10
-						# so 65 - 55 = 10
-Lower_Case:
-        addi $s5, $s5, -87			# same is done for lower case but not for numbers
-        j multiply
-Number:
-        addi $s5, $s5, -48
-        j multiply
+                Upper_Case:
+                        addi $s5, $s5, -55			# subtraction is done like this to the ASCII to get the value of the char
+                        j multiply				# like ASCII 'A' = 65 & 'A' in base 31 = 10
+                                                                # so 65 - 55 = 10
+                Lower_Case:
+                        addi $s5, $s5, -87			# same is done for lower case but not for numbers
+                        j multiply
+                Number:
+                        addi $s5, $s5, -48
+                        j multiply
+
+                next_step:
+			mul $s5, $s5, $s7		# value of letter times corresponding base^y
+        		div $s7, $s7, 31		# decreasingthe exponent of the register holding the highest power
+        		jal conversion
 
 # Error Branches
 
