@@ -95,7 +95,8 @@ find_highest_power:
         sub $s4, $s4, 1
         j find_highest_power
 
-exit:
+finishing_up:
+        jal conversion
 	move $a0, $t6                   # moves sum to a0
         li $v0, 1                       # prints contents of a0
         syscall
@@ -103,6 +104,12 @@ exit:
         syscall
 
 conversion:
+        addi $sp, $sp, -8		# allocate memory
+        sw $ra, 0($sp)			# store the return address
+        sw $s5, 4($sp)			# store the new 
+        beq $s1, $s6, finisha		# base case for recursion
+        add $t1, $a0, $s1		# incremental loading of pointer, iterating across input
+
         blt $s5, 48, incorrect_base_error       # checks if character is before 0 in ASCII chart
         blt $s5, 58, Number                     # checks if character is between 48 and 57
         blt $s5, 65, incorrect_base_error       # checks if character is between 58 and 64
