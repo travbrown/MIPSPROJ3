@@ -122,14 +122,14 @@ conversion:
 
                 Upper_Case:
                         addi $s5, $s5, -55			# subtraction is done like this to the ASCII to get the value of the char
-                        j multiply				# like ASCII 'A' = 65 & 'A' in base 31 = 10
+                        j next_steps				# like ASCII 'A' = 65 & 'A' in base 31 = 10
                                                                 # so 65 - 55 = 10
                 Lower_Case:
                         addi $s5, $s5, -87			# same is done for lower case but not for numbers
-                        j multiply
+                        j next_steps
                 Number:
                         addi $s5, $s5, -48
-                        j multiply
+                        j next_steps
 
                 next_step:
 			mul $s5, $s5, $s7		# value of letter times corresponding base^y
@@ -142,6 +142,13 @@ conversion:
         addi $sp, $sp, 8			# freeing up $sp, deallocating memory
         
         jr $ra					# jump return
+
+finisha:
+	li $v0, 0	
+        lw $ra, 0($sp)				# reload so we can return them
+        lw $s5, 4($sp)				
+        addi $sp, $sp, 8			# freeing up $sp, deallocating memory
+        jr $ra
 
 # Error Branches
 
@@ -170,8 +177,7 @@ empty_error:
         syscall
 
 invalid_base_or_len:	
-	bgt $t8, 2, too_long_error
-	j incorrect_base_error
-
+	bgt $t8, 3, too_long_error	# checks if too long	
+	j incorrect_base_error	# defaults to Invalid base if not too long
         
 	jr $ra
