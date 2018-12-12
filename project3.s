@@ -86,7 +86,7 @@ reset_ptr:                              # resetting the  pointer to the start of
         lb $s5, ($t1)			# load first byte
         sub $s4, $t3, $s7		# decremented and set the highest power for this paarticular length of valid string
 
-
+	move $s6, $t3			# place length of input in an s register so it doesn't get changed after calling a subprogram
 
 find_highest_power:
 	beq $s4, 0, conversion          # Determing the highest power
@@ -97,7 +97,7 @@ find_highest_power:
 
 finishing_up:
         jal conversion
-	move $a0, $t6                   # moves sum to a0
+	move $a0, $v0                   # moves sum to a0
         li $v0, 1                       # prints contents of a0
         syscall
         li $v0,10                       # Successfully ends program
