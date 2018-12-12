@@ -7,14 +7,14 @@
 main:
 	# getting user input
 	
-	li $v0, 8
-	la $a0, user_input
-	li $a1, 1000
+	li $v0, 8			# initiates the read string system  call 
+	la $a0, user_input		# load the address for the space set aside for the user input
+	li $a1, 1000			# space expected
 	syscall
 		
-	add $s5, $0, $0			# Initializing registers
-	add $t3, $0, $0
-        add $s1, $0, $0
+	addi $s5, $0, 0			# Initializing registers
+	addi $t3, $0, 0
+        addi $s1, $0, 0
 	                                # empty input check
         la $t1, user_input              # set pointer
         lb $s5, 0($t1)                  # load first element of string into register
@@ -37,22 +37,23 @@ space_processing:			# this label skips the spaces in the string until we find th
 
 
 char_processing:			# This label will skips over the char until a space, new line or nothing is detected 
-        lb $s5, 0($t1)
-        addi $t1, $t1, 1
-        addi $t3, $t3, 1
+        lb $s5, 0($t1)			# load byte where the pointer is
+        addi $t1, $t1, 1		# incrementing pointer
+        addi $t3, $t3, 1		# incrementing pointer-tracker
+        addi $t8, $t8, 1		# increment counter
         beq $s5, 10, return_to_start    # If we find a new line or nothing branch to return to start
-        beq $s5, 0, return_to_start
+        beq $s5, 0, return_to_start	
         bne $s5, 32, char_processing    # If it is NOT a space is found, then it  loops
 
 
 char_space_processing:			# At this point, we are checking if we are going to find only space
         lb $s5, 0($t1)			# or another set of characters.
-        addi $t1, $t1, 1		# incrementing pointer
-        addi $t3, $t3, 1		# incrementing counter
-	addi $t8, $t8, 1
+        addi $t1, $t1, 1		# incrementing pointer		
+        addi $t3, $t3, 1		# incrementing pointer-tracker
+        addi $t8, $t8, 1		# increment counter
         beq $s5, 10, return_to_start    # If string is finished branch to return to start
-        beq $s5, 0, return_to_start	
-        bne $s5, 32, invalid_base_or_len # will say invalid base if another char is found.
+        beq $s5, 0, return_to_start
+        bne $s5, 32, invalid_base_or_len # will check for invalid length or default to invalid base.
         j char_space_processing         # loops until it branches to one of the above mentioned labels
 
 
@@ -74,16 +75,17 @@ find_length:                            # loops until the incrementing counter h
         lb $s5, ($t1)			# and then it would give error message
         addi $t1, $t1, 1		# otherwise the input's length is valid
         addi $t3, $t3, 1
-	beq $s5, 10, reset_ptr
+	beq $s5, 10, reset_ptr		# Checking for the end of the sequence of letters
         beq $s5, 0, reset_ptr
         beq $s5, 32, reset_ptr
-        beq $t3, 5, too_long_error
+        beq $t3, 5, too_long_error	
         j find_length
+
 
 reset_ptr:                              # resetting the  pointer to the start of the string
         sub $t1, $t1, $t3
-        sub $t3, $t3, $s7
-        lb $s5, ($t1)			# load first byte
+        sub $t3, $t3, $s7		# this line brings the counter for the length to its correct place
+        lb $s5, 0($t1)			# load first byte
         sub $s4, $t3, $s7		# decremented and set the highest power for this paarticular length of valid string
 
 	move $s6, $t3			# place length of input in an s register so it doesn't get changed after calling a subprogram
@@ -92,7 +94,7 @@ find_highest_power:
 	beq $s4, 0, conversion          # Determing the highest power
         mult $s7, $s2			# Multiplying to the highest power
         mflo $s7			# until the counter = 0
-        sub $s4, $s4, 1
+        sub $s4, $s4, 1                 # decrement the length register
         j find_highest_power
 
 finishing_up:
@@ -100,7 +102,7 @@ finishing_up:
 	move $a0, $v0                   # moves sum to a0
         li $v0, 1                       # prints contents of a0
         syscall
-        li $v0,10                       # Successfully ends program
+        li $v0, 10                       # Successfully ends program
         syscall
 
 conversion:
@@ -121,20 +123,21 @@ conversion:
         blt $s5, 128, incorrect_base_error      # checks if character is between 118 and 127
 
                 Upper_Case:
-                        addi $s5, $s5, -55			# subtraction is done like this to the ASCII to get the value of the char
-                        j next_step				# like ASCII 'A' = 65 & 'A' in base 31 = 10
-                                                                # so 65 - 55 = 10
+                        addi $s5, $s5, -55	# subtraction is done like this to the ASCII to get the value of the char
+                        j next_step		# like ASCII 'A' = 65 & 'A' in base 31 = 10
+                                                # so 65 - 55 = 10
                 Lower_Case:
-                        addi $s5, $s5, -87			# same is done for lower case but not for numbers
+                        addi $s5, $s5, -87	# same is done for lower case but not for numbers
                         j next_step
                 Number:
                         addi $s5, $s5, -48
                         j next_step
 
                 next_step:
-			mul $s5, $s5, $s7		# value of letter times corresponding base^y
-        		div $s7, $s7, 31		# decreasingthe exponent of the register holding the highest power
+			mul $s5, $s5, $s7	# value of letter times corresponding base^y
+        		div $s7, $s7, 31	# decreasingthe exponent of the register holding the highest power
         		jal conversion
+
         add $v0, $s5, $v0			# adding up the rest of the calculation for the input
         
         lw $ra, 0($sp)				# reload so we can return them
