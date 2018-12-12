@@ -12,9 +12,10 @@ main:
 	li $a1, 1000			# space expected
 	syscall
 		
-	addi $s5, $0, 0			# Initializing registers
-	addi $t3, $0, 0
-        addi $s1, $0, 0
+	add $s5, $0, 0 			# Initializing registers
+	add $t3, $0, 0 
+	addi $s1, $0, 0
+
 	                                # empty input check
         la $t1, user_input              # set pointer
         lb $s5, 0($t1)                  # load first element of string into register
@@ -23,14 +24,14 @@ main:
 	
 	addi $s2, $0, 31                # Set Base number
         addi $t5, $0, 0
-        addi $s7, $0, 1			# Initialize register as 1
+        addi $s7, $0, 1			# Initialize register as 1 for exponent
         addi $t6, $0, 0
-	addi $t8, $0, 0
+        addi $t8, $0, 0
 
 space_processing:			# this label skips the spaces in the string until we find the irst character
 	lb $s5, 0($t1)			# load character pointer is at into the register t7
 	addi $t1, $t1, 1		# incrementing pointer
-        addi $t3, $t3, 1		# incrementing counter
+        addi $t3, $t3, 1		# incrementing pointer_tracker
         beq $s5, 32, space_processing   # loop and move forward if space detected
         beq $s5, 10, empty_error        # branches to Empty_error label if new line found
         beq $s5, $0, empty_error	# If a character is next, it will move on to next label automatically
@@ -91,10 +92,10 @@ reset_ptr:                              # resetting the  pointer to the start of
 	move $s6, $t3			# place length of input in an s register so it doesn't get changed after calling a subprogram
 
 find_highest_power:
-	beq $s4, 0, conversion          # Determing the highest power
+	beq $s4, 0, finishing_up          # Determing the highest power
         mult $s7, $s2			# Multiplying to the highest power
         mflo $s7			# until the counter = 0
-        sub $s4, $s4, 1                 # decrement the length register
+        sub $s4, $s4, 1			# decrement the length register
         j find_highest_power
 
 finishing_up:
