@@ -62,15 +62,12 @@ return_to_start:
         sub $t1, $t1, $t3               # restart the pointer in character array
         la $t3, 0                       # restart the counter
 
-
 move_forward:
         lb $s5, 0($t1)			# Skipping the spaces at the begin of the input (if any)
         addi $t1, $t1, 1		# to get to the first char in the string
         beq $s5, 32, move_forward	# this line stops iteratinng the string when it detects a letter
 
-
 addi $t1, $t1, -1 			# re-aligning the pointer with the first letter we loaded and then detected
-
 
 find_length:                            # loops until the incrementing counter hits 5
         lb $s5, ($t1)			# and then it would give error message
@@ -81,7 +78,6 @@ find_length:                            # loops until the incrementing counter h
         beq $s5, 32, reset_ptr
         beq $t3, 5, too_long_error	
         j find_length
-
 
 reset_ptr:                              # resetting the  pointer to the start of the string
         sub $t1, $t1, $t3
@@ -181,7 +177,7 @@ empty_error:
         syscall
 
 invalid_base_or_len:	
-	bgt $t8, 3, too_long_error	# checks if too long	
+	bge $t8, 4, too_long_error	# checks if too long	
 	j incorrect_base_error	# defaults to Invalid base if not too long
         
 	jr $ra
