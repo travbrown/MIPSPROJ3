@@ -122,14 +122,14 @@ conversion:
 
                 Upper_Case:
                         addi $s5, $s5, -55			# subtraction is done like this to the ASCII to get the value of the char
-                        j next_steps				# like ASCII 'A' = 65 & 'A' in base 31 = 10
+                        j next_step				# like ASCII 'A' = 65 & 'A' in base 31 = 10
                                                                 # so 65 - 55 = 10
                 Lower_Case:
                         addi $s5, $s5, -87			# same is done for lower case but not for numbers
-                        j next_steps
+                        j next_step
                 Number:
                         addi $s5, $s5, -48
-                        j next_steps
+                        j next_step
 
                 next_step:
 			mul $s5, $s5, $s7		# value of letter times corresponding base^y
