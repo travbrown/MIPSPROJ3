@@ -12,8 +12,8 @@ main:
 	li $a1, 1000			# space expected
 	syscall
 		
-	add $s5, $0, 0 			# Initializing registers
-	add $t3, $0, 0 
+	addi $s5, $0, 0 			# Initializing registers
+	addi $t3, $0, 0 
 	addi $s1, $0, 0
 
 	                                # empty input check
