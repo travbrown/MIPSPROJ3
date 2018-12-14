@@ -102,6 +102,7 @@ finishing_up:
         li $v0, 10                       # Successfully ends program
         syscall
 
+.globl conversion
 conversion:
         addi $sp, $sp, -8		# allocate memory
         sw $ra, 0($sp)			# store the return address
@@ -119,43 +120,50 @@ conversion:
         blt $s5, 118, Lower_Case                # checks if character is between 97 and 117
         blt $s5, 128, incorrect_base_error      # checks if character is between 118 and 127
 
-                Upper_Case:
-                        addi $s5, $s5, -55	# subtraction is done like this to the ASCII to get the value of the char
-                        j next_step		# like ASCII 'A' = 65 & 'A' in base 31 = 10
+        Upper_Case:
+                addi $s5, $s5, -55	# subtraction is done like this to the ASCII to get the value of the char
+                j next_step		# like ASCII 'A' = 65 & 'A' in base 31 = 10
                                                 # so 65 - 55 = 10
-                Lower_Case:
-                        addi $s5, $s5, -87	# same is done for lower case but not for numbers
-                        j next_step
-                Number:
-                        addi $s5, $s5, -48
-                        j next_step
+        Lower_Case:
+                addi $s5, $s5, -87	# same is done for lower case but not for numbers
+                j next_step
+        Number:
+                addi $s5, $s5, -48
+                j next_step
 
-                next_step:
-			mul $s5, $s5, $s7	# value of letter times corresponding base^y
-        		div $s7, $s7, 31	# decreasingthe exponent of the register holding the highest power
-        		jal conversion
+        next_step:
+		mul $s5, $s5, $s7	# value of letter times corresponding base^y
+        	div $s7, $s7, 31	# decreasingthe exponent of the register holding the highest power
+        	
+		addi $sp, $sp, -16
+		sw $s5, 0($sp) #curr char
+		sw $t1, 4($sp) #string address
+		sw $s1, 8($sp) #current power (initialized to 1)
+		sw $s6, 12($sp) #length string                
 
-        lw $v0, 0($sp)
-	addi $sp, $sp, 4
-        add $v0, $s5, $v0			# adding up the rest of the calculation for the input
-        
-        lw $ra, 0($sp)				# reload so we can return them
-        lw, $s5, 4($sp)			
-        addi $sp, $sp, 8			# freeing up $sp, deallocating memory
-        
-        addi $sp, $sp, -4
-	sw $v0, 0($sp)
+                jal conversion
 
-        jr $ra					# jump return
+                lw $v0, 0($sp)
+                addi $sp, $sp, 4
+                add $v0, $s5, $v0			# adding up the rest of the calculation for the input
+                
+                lw $ra, 0($sp)				# reload so we can return them
+                lw, $s5, 4($sp)			
+                addi $sp, $sp, 8			# freeing up $sp, deallocating memory
+                
+                addi $sp, $sp, -4
+                sw $v0, 0($sp)
 
-finisha:
-	li $v0, 0	
-        lw $ra, 0($sp)				# reload so we can return them
-        lw $s5, 4($sp)				
-        addi $sp, $sp, 8			# freeing up $sp, deallocating memory
-        addi $sp, $sp, -4
-	sw $v0, 0($sp)
-        jr $ra
+                jr $ra					# jump return
+
+                finisha:
+                        li $v0, 0	
+                        lw $ra, 0($sp)				# reload so we can return them
+                        lw $s5, 4($sp)				
+                        addi $sp, $sp, 8			# freeing up $sp, deallocating memory
+                        addi $sp, $sp, -4
+                        sw $v0, 0($sp)
+                        jr $ra
 
 # Error Branches
 
