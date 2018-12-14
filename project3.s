@@ -135,12 +135,17 @@ conversion:
         		div $s7, $s7, 31	# decreasingthe exponent of the register holding the highest power
         		jal conversion
 
+        lw $v0, 0($sp)
+	addi $sp, $sp, 4
         add $v0, $s5, $v0			# adding up the rest of the calculation for the input
         
         lw $ra, 0($sp)				# reload so we can return them
         lw, $s5, 4($sp)			
         addi $sp, $sp, 8			# freeing up $sp, deallocating memory
         
+        addi $sp, $sp, -4
+	sw $v0, 0($sp)
+
         jr $ra					# jump return
 
 finisha:
@@ -148,6 +153,8 @@ finisha:
         lw $ra, 0($sp)				# reload so we can return them
         lw $s5, 4($sp)				
         addi $sp, $sp, 8			# freeing up $sp, deallocating memory
+        addi $sp, $sp, -4
+	sw $v0, 0($sp)
         jr $ra
 
 # Error Branches
