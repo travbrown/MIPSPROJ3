@@ -104,9 +104,16 @@ finishing_up:
 
 .globl conversion
 conversion:
+        lw $s5, 0($sp)
+	lw $t1, 4($sp)
+	lw $s1, 8($sp)
+	lw $s6, 12($sp)
+	addi $sp, $sp, 16
+
         addi $sp, $sp, -8		# allocate memory
         sw $ra, 0($sp)			# store the return address
-        sw $s5, 4($sp)			# store the new 
+        sw $s5, 4($sp)			# store the new
+        
         beq $s1, $s6, finisha		# base case for recursion
         add $t1, $a0, $s1		# incremental loading of pointer, iterating across input
         addi $s1, $s1, 1		# increment counter
