@@ -95,10 +95,20 @@ find_highest_power:
         j find_highest_power
 
 finishing_up:
+	addi $sp, $sp, -16	# allocate memory
+	sw $s5, 0($sp)	#store the character
+	sw $t1, 4($sp) #storing string address
+	sw $s1, 8($sp)
+	sw $s6, 12($sp)       
+        
         jal conversion
-	move $a0, $v0                   # moves sum to a0
+	
+        lw $a0, 0($sp)
+	addi $sp, $sp, 4
+        
         li $v0, 1                       # prints contents of a0
         syscall
+        
         li $v0, 10                       # Successfully ends program
         syscall
 
@@ -113,11 +123,12 @@ conversion:
         addi $sp, $sp, -8		# allocate memory
         sw $ra, 0($sp)			# store the return address
         sw $s5, 4($sp)			# store the new
-        
+
         beq $s1, $s6, finisha		# base case for recursion
-        add $t1, $a0, $s1		# incremental loading of pointer, iterating across input
-        addi $s1, $s1, 1		# increment counter
         lb $s5, 0($t1)
+
+        addi $t1, $t1, 1	# incremental loading of pointer, iterating across input
+	addi $s1, $s1, 1	# increment counter
 
         blt $s5, 48, incorrect_base_error       # checks if character is before 0 in ASCII chart
         blt $s5, 58, Number                     # checks if character is between 48 and 57
