@@ -10,7 +10,7 @@ main:
 	li $v0, 8			# initiates the read string system  call 
 	la $a0, user_input		# load the address for the space set aside for the user input
 	li $a1, 1000			# space expected
-	syscall
+	syscall                         # calls the OS to execute                        
 		
 	addi $s5, $0, 0 			# Initializing registers
 	addi $t3, $0, 0 
@@ -92,33 +92,33 @@ find_highest_power:
         mult $s7, $s2			# Multiplying to the highest power
         mflo $s7			# until the counter = 0
         sub $s4, $s4, 1			# decrement the length register
-        j find_highest_power
+        j find_highest_power            # Jump to the find_highest_power label
 
 finishing_up:
-	addi $sp, $sp, -16	# allocate memory
-	sw $s5, 0($sp)	#store the character
-	sw $t1, 4($sp) #storing string address
-	sw $s1, 8($sp)
-	sw $s6, 12($sp)       
+	addi $sp, $sp, -16	        # allocate memory
+	sw $s5, 0($sp)	                # store the character
+	sw $t1, 4($sp)                  # storing string address
+	sw $s1, 8($sp)                  # memory allocated for the power
+	sw $s6, 12($sp)                 # for the length string
         
-        jal conversion
+        jal conversion                  # jump and link to the conversion label
 	
-        lw $a0, 0($sp)
-	addi $sp, $sp, 4
+        lw $a0, 0($sp)                  # unload the value $a0 to use
+	addi $sp, $sp, 4                # memory deallocation of the stack
         
         li $v0, 1                       # prints contents of a0
         syscall
         
         li $v0, 10                       # Successfully ends program
-        syscall
+        syscall                         # calls the OS to execute
 
 .globl conversion
-conversion:
-        lw $s5, 0($sp)
-	lw $t1, 4($sp)
-	lw $s1, 8($sp)
-	lw $s6, 12($sp)
-	addi $sp, $sp, 16
+conversion:                             # unloading the following below
+        lw $s5, 0($sp)                  # current char
+	lw $t1, 4($sp)                  # string address
+	lw $s1, 8($sp)                  # current power
+	lw $s6, 12($sp)                 # string length
+	addi $sp, $sp, 16               # deallocating the memory
 
         addi $sp, $sp, -8		# allocate memory
         sw $ra, 0($sp)			# store the return address
@@ -144,24 +144,24 @@ conversion:
                                                 # so 65 - 55 = 10
         Lower_Case:
                 addi $s5, $s5, -87	# same is done for lower case but not for numbers
-                j next_step
+                j next_step              # jump to next_step
         Number:
-                addi $s5, $s5, -48
-                j next_step
+                addi $s5, $s5, -48              
+                j next_step             # jump to next_step
 
         next_step:
 		mul $s5, $s5, $s7	# value of letter times corresponding base^y
         	div $s7, $s7, 31	# decreasingthe exponent of the register holding the highest power
         	
 		addi $sp, $sp, -16
-		sw $s5, 0($sp) #curr char
-		sw $t1, 4($sp) #string address
-		sw $s1, 8($sp) #current power (initialized to 1)
-		sw $s6, 12($sp) #length string                
+		sw $s5, 0($sp)          # curr char
+		sw $t1, 4($sp)          # string address
+		sw $s1, 8($sp)          # current power (initialized to 1)
+		sw $s6, 12($sp)         # length string                
 
-                jal conversion
+                jal conversion          # Jump & link to the conversion lable
 
-                lw $v0, 0($sp)
+                lw $v0, 0($sp)          
                 addi $sp, $sp, 4
                 add $v0, $s5, $v0			# adding up the rest of the calculation for the input
                 
@@ -175,42 +175,42 @@ conversion:
                 jr $ra					# jump return
 
                 finisha:
-                        li $v0, 0	
+                        li $v0, 0	                
                         lw $ra, 0($sp)				# reload so we can return them
                         lw $s5, 4($sp)				
                         addi $sp, $sp, 8			# freeing up $sp, deallocating memory
                         addi $sp, $sp, -4
-                        sw $v0, 0($sp)
-                        jr $ra
+                        sw $v0, 0($sp)                  
+                        jr $ra                          # jump and return to the return address currently in the register
 
 # Error Branches
 
 too_long_error:
-	la $a0, input_too_long
-        li $v0, 4
-        syscall
+	la $a0, input_too_long  # loads string
+        li $v0, 4               # Specifies print string system call
+        syscall                 # calls the OS to execute
 
-        li $v0, 10
-        syscall
+        li $v0, 10              # ends program
+        syscall                 # calls the OS to execute
 
 incorrect_base_error:
 	la $a0, wrong_base      # loads string
         li $v0, 4               # Specifies print string system call
-        syscall
+        syscall                 # calls the OS to execute
 
         li $v0,10               # ends program
-        syscall
+        syscall                 # calls the OS to execute
 
 empty_error:
         la $a0, input_empty     # loads string
         li $v0, 4               # Specifies print string system call
-        syscall
+        syscall                 # calls the OS to execute
 
 	li $v0,10               # ends program
-        syscall
+        syscall                 # calls the OS to execute
 
 invalid_base_or_len:	
 	bge $t8, 4, too_long_error	# checks if too long	
-	j incorrect_base_error	# defaults to Invalid base if not too long
+	j incorrect_base_error	        # defaults to Invalid base if not too long
         
-	jr $ra
+	jr $ra                         #  jump and return to the return address currently in the register
