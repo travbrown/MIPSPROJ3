@@ -1,0 +1,23 @@
+# Secrets & credentials
+.env*
+*.key
+*.pem
+credentials*
+secrets*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+*.o
+*.class
+a.out
+*.pyc
+__pycache__/
+
+# Dependencies
+node_modules/
+.venv/
+venv/
